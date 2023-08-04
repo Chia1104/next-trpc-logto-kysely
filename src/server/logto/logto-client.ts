@@ -1,4 +1,4 @@
-import LogtoClient, { type LogtoContext } from "@logto/next";
+import LogtoClient, { type LogtoContext } from "@logto/next/edge";
 import { env } from "@/env.mjs";
 import { getBaseUrl } from "@/utils/get-base-url";
 

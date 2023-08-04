@@ -10,11 +10,11 @@ interface CreateContextOptions {
   auth: LogtoContext | null;
   req?: NextRequest;
   db: Kysely<DB>;
-  headers?: NextRequest["headers"];
+  headers?: Headers;
 }
 
 export const createTRPCContext = async (opts: { req: NextRequest }) => {
-  const auth = await getUser();
+  const auth = await getUser(opts?.req);
 
   return {
     auth,

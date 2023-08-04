@@ -5,6 +5,5 @@ import { logtoClient } from "@/server/logto/logto-client";
 export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
-  // @ts-expect-error logto??
   return await logtoClient.handleUser()(request);
 }
