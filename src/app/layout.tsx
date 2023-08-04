@@ -2,6 +2,9 @@ import "./globals.css";
 import type { ReactNode } from "react";
 import { type Metadata } from "next";
 import { getBaseUrl } from "@/utils/get-base-url";
+import RootProvider from "@/components/root-provider";
+import Menu from "./menu";
+import { fetchUser } from "@/server/logto/fetch-user";
 
 export const metadata = {
   title: "Next App",
@@ -13,10 +16,22 @@ export const metadata = {
   ),
 } satisfies Metadata;
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const user = await fetchUser();
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="transition-all duration-700 ease-in-out">
+        <RootProvider>
+          <Menu
+            status={user.isAuthenticated ? "authenticated" : "unauthenticated"}
+          />
+          {children}
+        </RootProvider>
+      </body>
     </html>
   );
 }

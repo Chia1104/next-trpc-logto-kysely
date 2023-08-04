@@ -6,6 +6,9 @@ const handler = (req: NextRequest) => {
   return fetchRequestHandler({
     endpoint: "/api/trpc",
     req,
+    /**
+     * @TODO fix type
+     */
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     createContext: createTRPCContext,

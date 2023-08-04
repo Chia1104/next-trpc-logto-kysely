@@ -4,7 +4,7 @@ interface Options {
   isServer?: boolean;
 }
 
-export const getBaseUrl = (opts?: Options) => {
+export const getBaseUrl = (opts?: Options): string => {
   opts ??= {};
   const { isServer } = opts;
   if (typeof window !== "undefined" && !isServer) {
@@ -18,5 +18,5 @@ export const getBaseUrl = (opts?: Options) => {
     return `https://${env.VERCEL_URL}`;
   }
 
-  return env.BASE_URL ?? `http://localhost:${env.PORT}`;
+  return (env.BASE_URL as string) ?? `http://localhost:${env.PORT}`;
 };

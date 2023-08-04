@@ -7,7 +7,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 import type { Status } from "./enums";
 
 export type Todo = {
-  id: Generated<number>;
+  id: string;
   title: string;
   description: string | null;
   status: Generated<Status>;

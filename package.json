@@ -17,12 +17,14 @@
     "test:watch": "vitest",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,cjs,mjs,ts,tsx,md}\"",
-    "type:check": "tsc --noEmit"
+    "type:check": "tsc --noEmit",
+    "db:push": "prisma db push"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@logto/next": "^2.1.2",
     "@next/bundle-analyzer": "^13.4.12",
+    "@nextui-org/react": "^2.0.1",
     "@t3-oss/env-nextjs": "^0.6.0",
     "@tanstack/react-query": "^4.32.5",
     "@trpc/client": "^10.37.1",
@@ -33,6 +35,7 @@
     "dayjs": "^1.11.9",
     "framer-motion": "^10.15.0",
     "kysely": "^0.26.1",
+    "nanoid": "^4.0.2",
     "next": "^13.4.12",
     "next-themes": "^0.2.1",
     "pg": "^8.11.2",
@@ -46,6 +49,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@testing-library/react": "^14.0.0",
     "@total-typescript/ts-reset": "^0.4.2",
     "@types/node": "20.4.7",
@@ -61,7 +65,7 @@
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-prettier": "^5.0.0",
     "happy-dom": "^10.7.0",
-    "husky": "^8.0.3",
+    "husky": "^8.0.0",
     "lint-staged": "^13.2.3",
     "postcss": "8.4.27",
     "prettier": "^3.0.1",
@@ -70,6 +74,7 @@
     "prisma-kysely": "^1.5.0",
     "shell-quote": "^1.8.1",
     "tailwindcss": "3.3.3",
+    "tsx": "^3.12.7",
     "turbo": "^1.10.12",
     "typescript": "5.1.6",
     "vitest": "^0.34.1"
