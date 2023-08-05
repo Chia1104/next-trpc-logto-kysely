@@ -12,7 +12,7 @@ export type Todo = {
   description: string | null;
   status: Generated<Status>;
   createdAt: Generated<Timestamp>;
-  updatedAt: Timestamp;
+  updatedAt: Timestamp | null;
   userId: string;
 };
 export type DB = {

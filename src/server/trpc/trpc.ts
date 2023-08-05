@@ -51,7 +51,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
     ctx: {
       auth: {
         ...ctx.auth,
-        userId: ctx.auth.userInfo?.sub,
+        userId: ctx.auth.claims?.sub,
       },
     },
   });

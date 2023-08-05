@@ -21,12 +21,12 @@ enum Status {
 }
 
 model Todo {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
-  status      Status   @default(UNCOMPLETED)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      Status    @default(UNCOMPLETED)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
   userId      String
 
   @@index([userId])
