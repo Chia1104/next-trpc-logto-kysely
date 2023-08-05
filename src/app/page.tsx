@@ -1,5 +1,4 @@
 import { api } from "@/server/trpc/server";
-import { fetchUser } from "@/server/logto/fetch-user";
 import { type RouterOutputs } from "@/server/trpc";
 
 /**
@@ -7,14 +6,9 @@ import { type RouterOutputs } from "@/server/trpc";
  */
 export default async function Home() {
   let todos: RouterOutputs["todo"]["read"]["data"] = [];
-  const user = await fetchUser();
   const message = await api.example.hello.query();
   try {
-    todos = (
-      await api.todo.read.query({
-        userId: user.userInfo?.sub ?? "",
-      })
-    ).data;
+    todos = (await api.todo.read.query()).data;
   } catch (error) {
     todos = [];
   }

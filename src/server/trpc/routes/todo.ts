@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { Status } from "@/server/db/enums";
+import { TRPCError } from "@trpc/server";
 
 /**
  * @TODO
@@ -31,9 +32,15 @@ export const todoRouter = createTRPCRouter({
       };
     }),
   read: protectedProcedure
-    .input(z.object({ userId: z.string() }))
+    .input(z.object({ userId: z.string().optional() }).optional())
     .query(async (opts) => {
-      const userId = opts.ctx.auth.userId ?? opts.input.userId;
+      const userId = opts.ctx.auth.userId ?? opts.input?.userId;
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized",
+        });
+      }
       const query = opts.ctx.db
         .selectFrom("Todo")
         .select(["id", "title", "description", "status"])
