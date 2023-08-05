@@ -2,7 +2,7 @@ import LogtoClient, { type LogtoContext } from "@logto/next/edge";
 import { env } from "@/env.mjs";
 import { getBaseUrl } from "@/utils/get-base-url";
 
-export const logtoClient = new LogtoClient({
+export const logtoClientEdge = new LogtoClient({
   appId: env.LOGTO_APP_ID,
   appSecret: env.LOGTO_APP_SECRET,
   endpoint: env.LOGTO_ENDPOINT,

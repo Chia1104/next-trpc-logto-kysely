@@ -1,9 +1,18 @@
 import { type NextRequest } from "next/server";
 
-import { logtoClient } from "@/server/logto/logto-client";
+import { logtoClientEdge } from "@/server/logto/logto-client";
 
 export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
-  return await logtoClient.handleSignInCallback()(request);
+  console.log(
+    "sign-in-callback/route.ts: GET - ",
+    "url: ",
+    request.url.toString(),
+    "nextUrl: ",
+    request.nextUrl.toString(),
+    "headers['host']: ",
+    request.headers.get("host")
+  );
+  return await logtoClientEdge.handleSignInCallback()(request);
 }
