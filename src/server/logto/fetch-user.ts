@@ -4,17 +4,12 @@ import { cookies } from "next/headers";
 import { getBaseUrl } from "@/utils/get-base-url";
 
 export async function fetchUser() {
-  const response = await fetch(
-    `${getBaseUrl({
-      isServer: true,
-    })}/api/logto/user`,
-    {
-      cache: "no-store",
-      headers: {
-        cookie: cookies().toString(),
-      },
-    }
-  );
+  const response = await fetch(`${getBaseUrl()}/api/logto/user`, {
+    cache: "no-store",
+    headers: {
+      cookie: cookies().toString(),
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Something went wrong!");
