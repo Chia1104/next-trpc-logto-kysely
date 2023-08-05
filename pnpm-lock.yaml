@@ -11,9 +11,6 @@ dependencies:
   '@logto/next':
     specifier: ^2.1.2
     version: 2.1.2(next@13.4.12)
-  '@logto/node':
-    specifier: ^2.1.1
-    version: 2.1.1
   '@next/bundle-analyzer':
     specifier: ^13.4.12
     version: 13.4.12
@@ -47,9 +44,6 @@ dependencies:
   framer-motion:
     specifier: ^10.15.0
     version: 10.15.0(react-dom@18.2.0)(react@18.2.0)
-  iron-session:
-    specifier: ^6.3.1
-    version: 6.3.1(next@13.4.12)
   kysely:
     specifier: ^0.26.1
     version: 0.26.1
