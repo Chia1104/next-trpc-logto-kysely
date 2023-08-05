@@ -6,9 +6,7 @@ export const logtoClient = new LogtoClient({
   appId: env.LOGTO_APP_ID,
   appSecret: env.LOGTO_APP_SECRET,
   endpoint: env.LOGTO_ENDPOINT,
-  baseUrl: getBaseUrl({
-    isServer: true,
-  }),
+  baseUrl: getBaseUrl(),
   cookieSecret: env.LOGTO_COOKIE_SECRET,
   cookieSecure: env.LOGTO_COOKIE_SCURE,
 });

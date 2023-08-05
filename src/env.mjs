@@ -38,7 +38,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
     VERCEL_URL: process.env.VERCEL_URL,
-    ZEABUR_URL: process.env.ZEABUR_URL || process.env.NEXT_PUBLIC_ZEABUR_URL,
+    ZEABUR_URL: process.env.ZEABUR_URL,
     BASE_URL: process.env.BASE_URL,
     LOGTO_ENDPOINT: process.env.LOGTO_ENDPOINT,
     LOGTO_APP_ID: process.env.LOGTO_APP_ID,
