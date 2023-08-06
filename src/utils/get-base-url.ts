@@ -14,6 +14,10 @@ export const getBaseUrl = (opts?: Options): string => {
     return `https://${env.ZEABUR_URL}`;
   }
 
+  if (env.RAILWAY_URL) {
+    return `https://${env.RAILWAY_URL}`;
+  }
+
   if (env.VERCEL_URL) {
     return `https://${env.VERCEL_URL}`;
   }
