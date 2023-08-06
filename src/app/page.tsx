@@ -1,5 +1,5 @@
 import { api } from "@/server/trpc/server";
-import Todos, { AddTodo } from "@/app/todos";
+import Todos, { AddTodo, Skeleton } from "@/app/todos";
 import { fetchUser } from "@/server/logto/fetch-user";
 import { Suspense } from "react";
 
@@ -20,10 +20,16 @@ const Unauthorized = () => {
 export default async function Home() {
   const { isAuthenticated } = await fetchUser();
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
+    <main className="flex min-h-screen flex-col items-center p-5 py-24 md:p-24">
       {isAuthenticated && <AddTodo className="justify-self-start" />}
       {isAuthenticated ? (
-        <Suspense fallback={<p>LOADING!!!</p>}>
+        <Suspense
+          fallback={[1, 2, 3, 4].map((i) => (
+            <Skeleton
+              key={i}
+              className="mb-5 h-10 w-full max-w-[800px] rounded-xl"
+            />
+          ))}>
           <TodoList />
         </Suspense>
       ) : (

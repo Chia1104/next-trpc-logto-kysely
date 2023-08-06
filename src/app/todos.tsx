@@ -5,6 +5,7 @@ import {
   useCallback,
   experimental_useOptimistic as useOptimistic,
   useTransition,
+  useMemo,
 } from "react";
 import { api, type RouterOutputs } from "@/server/trpc/client";
 import { useForm, Controller } from "react-hook-form";
@@ -24,12 +25,20 @@ import {
   Accordion,
   AccordionItem,
   Checkbox,
+  Skeleton,
 } from "@nextui-org/react";
 import { toast } from "sonner";
 import { cn } from "@/utils";
 import { type ClassValue } from "clsx";
 import { Status } from "@/server/db/enums";
 import { revalidate } from "./revalidate-todos";
+import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
+
+const EditButton = dynamic(() => import("./edit"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-8 w-8 rounded-lg" />,
+});
 
 interface TodoProps {
   todos: Todos;
@@ -58,6 +67,11 @@ const AddTodoForm: FC<{ onOpenChange?: () => void }> = ({ onOpenChange }) => {
     [handleSubmit, onOpenChange]
   );
 
+  const { theme } = useTheme();
+  const color = useMemo(() => {
+    return theme === "dark" ? "secondary" : "primary";
+  }, [theme]);
+
   return (
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form onSubmit={onSubmit}>
@@ -72,7 +86,7 @@ const AddTodoForm: FC<{ onOpenChange?: () => void }> = ({ onOpenChange }) => {
                 {...field}
                 isRequired
                 label="Title"
-                color={invalid ? "danger" : "primary"}
+                color={invalid ? "danger" : color}
                 errorMessage={error?.message}
               />
             </>
@@ -86,7 +100,7 @@ const AddTodoForm: FC<{ onOpenChange?: () => void }> = ({ onOpenChange }) => {
               <Textarea
                 {...field}
                 label="Description"
-                color={invalid ? "danger" : "primary"}
+                color={invalid ? "danger" : color}
                 errorMessage={error?.message}
               />
             </>
@@ -101,7 +115,7 @@ const AddTodoForm: FC<{ onOpenChange?: () => void }> = ({ onOpenChange }) => {
           disabled={isPending}>
           Close
         </Button>
-        <Button color="primary" type="submit" isLoading={isPending}>
+        <Button color={color} type="submit" isLoading={isPending}>
           Save
         </Button>
       </ModalFooter>
@@ -132,9 +146,12 @@ interface CheckTodoProps<TTodo = unknown> {
 
 const CheckTodo = <TTodo = unknown,>({ todo }: CheckTodoProps<TTodo>) => {
   return (
-    <Checkbox defaultSelected={todo.status === Status.COMPLETED} lineThrough>
-      {todo.title}
-    </Checkbox>
+    <div className="wi-full flex justify-between">
+      <Checkbox defaultSelected={todo.status === Status.COMPLETED} lineThrough>
+        {todo.title}
+      </Checkbox>
+      <EditButton todo={todo} />
+    </div>
   );
 };
 
@@ -166,4 +183,4 @@ const Todos: FC<TodoProps> = ({ todos, className }) => {
 };
 
 export default Todos;
-export { AddTodo };
+export { AddTodo, Skeleton };
