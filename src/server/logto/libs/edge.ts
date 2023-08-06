@@ -89,17 +89,18 @@ export default class LogtoClient extends BaseClient {
       const nodeClient = this.createNodeClient(session);
 
       /**
-       * we don't trust the hostname from the request header,
+       * we don't trust the hostname from the request header(e.g. request.headers.get('host')),
        * so we replace it if it's(nextUrl, url) from localhost in production
        */
+      const shouldRewrite = /http:\/\/(localhost|railway):(\d+)/;
       if (
         request.nextUrl.href &&
-        request.nextUrl.href.includes(`http://localhost:${env.PORT}`) &&
+        shouldRewrite.test(request.nextUrl.href) &&
         (env.RAILWAY_URL || env.ZEABUR_URL)
       ) {
         const url = new URL(
           request.nextUrl.href.replace(
-            /http:\/\/(localhost|railway):(\d+)/,
+            shouldRewrite,
             getBaseUrl({ isServer: true })
           )
         );
