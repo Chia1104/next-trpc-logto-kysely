@@ -11,7 +11,6 @@
     "build:next": "next build",
     "build": "turbo run build:next",
     "start": "next start",
-    "zeabur:start": "next start --hostname next-trpc-logto-kysely.zeabur.app",
     "lint": "next lint",
     "prepare": "husky install",
     "test": "vitest run",
