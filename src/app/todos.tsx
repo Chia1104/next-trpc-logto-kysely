@@ -34,6 +34,7 @@ import { Status } from "@/server/db/enums";
 import { revalidate } from "./revalidate-todos";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
+import dayjs from "dayjs";
 
 const EditButton = dynamic(() => import("./edit"), {
   ssr: false,
@@ -139,27 +140,51 @@ const AddTodo: FC<ButtonProps> = (props) => {
   );
 };
 
-interface CheckTodoProps<TTodo = unknown> {
+interface CheckTodoProps {
   todo: Todos[0];
-  action?: (action: TTodo) => void;
 }
 
-const CheckTodo = <TTodo = unknown,>({ todo }: CheckTodoProps<TTodo>) => {
+const CheckTodo = ({ todo }: CheckTodoProps) => {
+  const [optimisticTodo, setOptimisticTodo] = useOptimistic<
+    Todos[0],
+    Todos[0]["status"]
+  >(todo, (state, status) => {
+    return {
+      ...state,
+      status,
+    };
+  });
+  const handleCheck = useCallback(async () => {
+    try {
+      setOptimisticTodo(
+        todo.status === Status.COMPLETED ? Status.UNCOMPLETED : Status.COMPLETED
+      );
+      await api.todo.update.mutate({
+        id: todo.id,
+        status:
+          todo.status === Status.COMPLETED
+            ? Status.UNCOMPLETED
+            : Status.COMPLETED,
+      });
+      await revalidate();
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  }, [setOptimisticTodo, todo]);
   return (
     <div className="wi-full flex justify-between">
-      <Checkbox defaultSelected={todo.status === Status.COMPLETED} lineThrough>
-        {todo.title}
+      <Checkbox
+        isSelected={optimisticTodo.status === Status.COMPLETED}
+        onValueChange={() => void handleCheck()}
+        lineThrough>
+        {optimisticTodo.title}
       </Checkbox>
-      <EditButton todo={todo} />
+      <EditButton todo={optimisticTodo} />
     </div>
   );
 };
 
 const Todos: FC<TodoProps> = ({ todos, className }) => {
-  const [optimisticTodos, setOptimisticTodos] = useOptimistic<Todos, Todos[0]>(
-    todos,
-    (state, newTodo) => [...state, newTodo]
-  );
   return (
     <div
       className={cn(
@@ -167,14 +192,16 @@ const Todos: FC<TodoProps> = ({ todos, className }) => {
         className
       )}>
       <Accordion>
-        {optimisticTodos.map((todo) => (
+        {todos.map((todo) => (
           <AccordionItem
             key={todo.id}
             aria-label={todo.title}
-            title={
-              <CheckTodo<Todos[0]> todo={todo} action={setOptimisticTodos} />
-            }>
-            {todo.description}
+            title={<CheckTodo todo={todo} />}>
+            <p className="ml-10">{todo.description}</p>
+            <br />
+            <p className="mr-14 text-end">
+              {dayjs(todo.createdAt).format("DD/MM/YYYY")}
+            </p>
           </AccordionItem>
         ))}
       </Accordion>

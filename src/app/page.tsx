@@ -24,12 +24,13 @@ export default async function Home() {
       {isAuthenticated && <AddTodo className="justify-self-start" />}
       {isAuthenticated ? (
         <Suspense
-          fallback={[1, 2, 3, 4].map((i) => (
-            <Skeleton
-              key={i}
-              className="mb-5 h-10 w-full max-w-[800px] rounded-xl"
-            />
-          ))}>
+          fallback={
+            <div className="mt-10 w-full max-w-[800px]">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="mb-5 h-16 w-full rounded-xl" />
+              ))}
+            </div>
+          }>
           <TodoList />
         </Suspense>
       ) : (

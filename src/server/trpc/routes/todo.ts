@@ -45,7 +45,8 @@ export const todoRouter = createTRPCRouter({
       }
       const baseQuery = opts.ctx.db
         .selectFrom("Todo")
-        .select(["id", "title", "description", "status"]);
+        .select(["id", "title", "description", "status", "createdAt"])
+        .orderBy("createdAt", "desc");
       const query = id
         ? baseQuery.where(({ eb, and }) =>
             and([eb("userId", "=", userId), eb("id", "=", id)])
@@ -58,6 +59,9 @@ export const todoRouter = createTRPCRouter({
       };
     }),
   update: protectedProcedure.input(updateTodoSchema).mutation(async (opts) => {
+    // delay 5 s (test useOptimistic)
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
+
     void (await opts.ctx.db
       .updateTable("Todo")
       .set({
@@ -72,7 +76,7 @@ export const todoRouter = createTRPCRouter({
     };
   }),
   delete: protectedProcedure
-    .input(z.object({ userId: z.string(), id: z.string() }))
+    .input(z.object({ id: z.string() }))
     .mutation(async (opts) => {
       void (await opts.ctx.db
         .deleteFrom("Todo")
