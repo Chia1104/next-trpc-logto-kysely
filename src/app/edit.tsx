@@ -17,7 +17,7 @@ import { api, type RouterOutputs } from "@/server/trpc/client";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateTodoSchema, type UpdateTodo } from "@/utils/validators";
-import { revalidate } from "@/app/revalidate-todos";
+import { revalidate } from "@/app/revalidate-todos.action";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 

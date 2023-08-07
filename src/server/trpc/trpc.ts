@@ -5,10 +5,12 @@ import { ZodError } from "zod";
 import { db, type Kysely, type DB } from "@/server/db";
 import { type LogtoContext } from "../logto/logto-client";
 import { getUser } from "../logto/get-user";
+import { fetchUser } from "@/server/logto/fetch-user";
+import { experimental_createServerActionHandler } from "@trpc/next/app-dir/server";
+import { headers } from "next/headers";
 
 interface CreateContextOptions {
   auth: LogtoContext | null;
-  req?: NextRequest;
   db: Kysely<DB>;
   headers?: Headers;
 }
@@ -18,7 +20,6 @@ export const createTRPCContext = async (opts: { req: NextRequest }) => {
 
   return {
     auth,
-    req: opts.req,
     db,
     headers: opts?.req?.headers,
   } satisfies CreateContextOptions;
@@ -58,3 +59,15 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+export const createAction = experimental_createServerActionHandler(t, {
+  createContext: async () => {
+    const auth = await fetchUser();
+
+    return {
+      auth,
+      db,
+      headers: headers(),
+    } satisfies CreateContextOptions;
+  },
+});

@@ -31,10 +31,12 @@ import { toast } from "sonner";
 import { cn } from "@/utils";
 import { type ClassValue } from "clsx";
 import { Status } from "@/server/db/enums";
-import { revalidate } from "./revalidate-todos";
+import { revalidate } from "./revalidate-todos.action";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import dayjs from "dayjs";
+import { useAction } from "@/server/trpc/client";
+import { updateStatusAction } from "@/app/update-status.action";
 
 const EditButton = dynamic(() => import("./edit"), {
   ssr: false,
@@ -154,12 +156,23 @@ const CheckTodo = ({ todo }: CheckTodoProps) => {
       status,
     };
   });
+  const mutation = useAction(updateStatusAction, {
+    onSuccess() {
+      toast.success("Todo updated");
+    },
+    onError() {
+      toast.error("Something went wrong");
+    },
+  });
   const handleCheck = useCallback(async () => {
     try {
+      /**
+       * @TODO: This is a workaround to optimize the optimistic update
+       */
       setOptimisticTodo(
         todo.status === Status.COMPLETED ? Status.UNCOMPLETED : Status.COMPLETED
       );
-      await api.todo.update.mutate({
+      mutation.mutate({
         id: todo.id,
         status:
           todo.status === Status.COMPLETED
