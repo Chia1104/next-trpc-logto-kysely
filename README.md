@@ -50,4 +50,4 @@ pnpm dev
 
 You can deploy the project to [Zeabur](https://zeabur.com/) with one click.
 
-TBD
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/TCH9AR?referralCode=Chia1104)
