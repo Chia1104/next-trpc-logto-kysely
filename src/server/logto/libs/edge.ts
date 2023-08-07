@@ -90,7 +90,7 @@ export default class LogtoClient extends BaseClient {
 
       /**
        * we don't trust the hostname from the request header(e.g. request.headers.get('host')),
-       * so we replace it if it's(nextUrl, url) from localhost in production
+       * so we replace the nextUrl or url if it's from localhost in production
        */
       const shouldRewrite = /http:\/\/(localhost|railway):(\d+)/;
       if (
