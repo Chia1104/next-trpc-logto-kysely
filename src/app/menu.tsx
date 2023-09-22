@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -22,7 +23,7 @@ import Image from "@/components/image";
 import { useRouter, useSelectedLayoutSegments } from "next/navigation";
 import { type FC, type Key, useState } from "react";
 import { type LogtoContext } from "@logto/next";
-import Link from "next/link";
+import NextLink from "next/link";
 
 interface MenuProps {
   status: "authenticated" | "unauthenticated";
@@ -134,20 +135,20 @@ const Menu: FC<MenuProps> = ({ status }) => {
       </NavbarContent>
       <NavbarMenu>
         <NavbarMenuItem>
-          <Link
+          <NextLink
             className="w-full text-primary"
             href="/"
             onClick={() => setIsMenuOpen(false)}>
             Todo
-          </Link>
+          </NextLink>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link
+          <NextLink
             className="w-full text-primary"
             href="/guestbook"
             onClick={() => setIsMenuOpen(false)}>
             Guestbook
-          </Link>
+          </NextLink>
         </NavbarMenuItem>
       </NavbarMenu>
     </Navbar>
