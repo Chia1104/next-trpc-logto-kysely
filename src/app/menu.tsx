@@ -1,11 +1,12 @@
 "use client";
 
 import {
-  Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
+  NavbarMenu,
+  NavbarMenuItem,
   Button,
   Avatar,
   Dropdown,
@@ -14,12 +15,14 @@ import {
   DropdownItem,
   Tabs,
   Tab,
+  NavbarMenuToggle,
 } from "@nextui-org/react";
 import ToggleTheme from "@/components/toggle-theme";
 import Image from "@/components/image";
 import { useRouter, useSelectedLayoutSegments } from "next/navigation";
-import { type FC, type Key } from "react";
+import { type FC, type Key, useState } from "react";
 import { type LogtoContext } from "@logto/next";
+import Link from "next/link";
 
 interface MenuProps {
   status: "authenticated" | "unauthenticated";
@@ -71,6 +74,8 @@ const User: FC<MenuProps> = ({ status, user }) => {
 const Menu: FC<MenuProps> = ({ status }) => {
   const router = useRouter();
   const selectedLayoutSegments = useSelectedLayoutSegments();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const handlePush = (key: Key) => {
     switch (key) {
       case "todo":
@@ -85,21 +90,31 @@ const Menu: FC<MenuProps> = ({ status }) => {
   };
   return (
     <Navbar
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
       position="sticky"
       maxWidth="full"
       isBordered={false}
       className="trainstion-all fixed border-0"
       shouldHideOnScroll>
-      <NavbarBrand className="cursor-pointer" onClick={() => router.push("/")}>
-        <Image
-          src="/icon.png"
-          alt="icon"
-          className="overflow-hidden rounded-full"
-          width={50}
-          height={50}
-          blur={false}
+      <NavbarContent>
+        <NavbarBrand
+          className="hidden cursor-pointer md:block"
+          onClick={() => router.push("/")}>
+          <Image
+            src="/icon.png"
+            alt="icon"
+            className="overflow-hidden rounded-full"
+            width={50}
+            height={50}
+            blur={false}
+          />
+        </NavbarBrand>
+        <NavbarMenuToggle
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          className="md:hidden"
         />
-      </NavbarBrand>
+      </NavbarContent>
       <NavbarContent className="hidden md:flex" justify="center">
         <Tabs
           size="md"
@@ -117,6 +132,24 @@ const Menu: FC<MenuProps> = ({ status }) => {
           <ToggleTheme />
         </NavbarItem>
       </NavbarContent>
+      <NavbarMenu>
+        <NavbarMenuItem>
+          <Link
+            className="w-full text-primary"
+            href="/"
+            onClick={() => setIsMenuOpen(false)}>
+            Todo
+          </Link>
+        </NavbarMenuItem>
+        <NavbarMenuItem>
+          <Link
+            className="w-full text-primary"
+            href="/guestbook"
+            onClick={() => setIsMenuOpen(false)}>
+            Guestbook
+          </Link>
+        </NavbarMenuItem>
+      </NavbarMenu>
     </Navbar>
   );
 };
