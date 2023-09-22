@@ -22,5 +22,5 @@ export const getBaseUrl = (opts?: Options): string => {
     return `https://${env.VERCEL_URL}`;
   }
 
-  return (env.BASE_URL as string) ?? `http://localhost:${env.PORT}`;
+  return (env.BASE_URL as string) || `http://localhost:${env.PORT}`;
 };

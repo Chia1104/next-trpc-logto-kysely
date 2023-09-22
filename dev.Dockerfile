@@ -2,18 +2,18 @@ ARG NODE_TAG=18-alpine
 
 FROM node:${NODE_TAG} AS base
 
-FROM base AS deps
-
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 RUN apk add --no-cache libc6-compat &&  \
-    corepack enable && \
-    pnpm i
+    corepack enable
+
+FROM base AS deps
+
+RUN pnpm i
 
 FROM base AS builder
 
-WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -39,13 +39,9 @@ ENV TURBO_TEAM=${TURBO_TEAM} \
     LOGTO_COOKIE_SECRET=${LOGTO_COOKIE_SECRET} \
     DATABASE_URL=${DATABASE_URL}
 
-RUN apk add --no-cache libc6-compat &&  \
-    corepack enable && \
-    pnpm build
+RUN pnpm build
 
 FROM base AS runner
-
-WORKDIR /app
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

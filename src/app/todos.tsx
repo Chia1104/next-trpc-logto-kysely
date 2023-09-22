@@ -166,9 +166,6 @@ const CheckTodo = ({ todo }: CheckTodoProps) => {
   });
   const handleCheck = useCallback(async () => {
     try {
-      /**
-       * @TODO: This is a workaround to optimize the optimistic update
-       */
       setOptimisticTodo(
         todo.status === Status.COMPLETED ? Status.UNCOMPLETED : Status.COMPLETED
       );
@@ -204,20 +201,24 @@ const Todos: FC<TodoProps> = ({ todos, className }) => {
         "w-full max-w-[800px] rounded-2xl bg-light p-2 transition-all dark:bg-dark",
         className
       )}>
-      <Accordion>
-        {todos.map((todo) => (
-          <AccordionItem
-            key={todo.id}
-            aria-label={todo.title}
-            title={<CheckTodo todo={todo} />}>
-            <p className="ml-10">{todo.description}</p>
-            <br />
-            <p className="mr-14 text-end">
-              {dayjs(todo.createdAt).format("DD/MM/YYYY")}
-            </p>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      {todos?.length ? (
+        <Accordion>
+          {todos.map((todo) => (
+            <AccordionItem
+              key={todo.id}
+              aria-label={todo.title}
+              title={<CheckTodo todo={todo} />}>
+              <p className="ml-10">{todo.description}</p>
+              <br />
+              <p className="mr-14 text-end">
+                {dayjs(todo.createdAt).format("DD/MM/YYYY")}
+              </p>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      ) : (
+        <p className="text-center text-lg">No todos yet</p>
+      )}
     </div>
   );
 };

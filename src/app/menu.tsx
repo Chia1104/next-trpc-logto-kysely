@@ -18,7 +18,7 @@ import {
 import ToggleTheme from "@/components/toggle-theme";
 import Image from "@/components/image";
 import { useRouter, useSelectedLayoutSegments } from "next/navigation";
-import { type FC } from "react";
+import { type FC, type Key } from "react";
 import { type LogtoContext } from "@logto/next";
 
 interface MenuProps {
@@ -71,6 +71,18 @@ const User: FC<MenuProps> = ({ status, user }) => {
 const Menu: FC<MenuProps> = ({ status }) => {
   const router = useRouter();
   const selectedLayoutSegments = useSelectedLayoutSegments();
+  const handlePush = (key: Key) => {
+    switch (key) {
+      case "todo":
+        router.push("/");
+        break;
+      case "guestbook":
+        router.push("/guestbook");
+        break;
+      default:
+        break;
+    }
+  };
   return (
     <Navbar
       position="sticky"
@@ -93,17 +105,10 @@ const Menu: FC<MenuProps> = ({ status }) => {
           size="md"
           variant="solid"
           radius="lg"
+          onSelectionChange={(key) => handlePush(key)}
           selectedKey={selectedLayoutSegments[0] ?? "todo"}>
-          <Tab
-            title="Todo"
-            key="todo"
-            onClickCapture={() => router.push("/")}
-          />
-          <Tab
-            title="Guestbook"
-            key="guestbook"
-            onClickCapture={() => router.push("/guestbook")}
-          />
+          <Tab title="Todo" key="todo" />
+          <Tab title="Guestbook" key="guestbook" />
         </Tabs>
       </NavbarContent>
       <NavbarContent justify="end">

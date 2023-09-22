@@ -4,8 +4,9 @@ import { type FC, useId, type ComponentProps, useMemo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/utils";
 import { useTheme } from "next-themes";
+import {Button, type ButtonProps} from "@nextui-org/react";
 
-interface ToggleThemeProps extends ComponentProps<"button"> {
+interface ToggleThemeProps extends ButtonProps {
   toggleTheme?: () => void;
   isDark?: boolean;
 }
@@ -58,15 +59,17 @@ const ToggleTheme: FC<ToggleThemeProps> = ({
     },
   };
   return (
-    <button
+    <Button
       {...props}
+      isIconOnly
+      size="sm"
       onClick={(e) => {
         toggleTheme?.();
         setTheme(isDark ? "light" : "dark");
         props?.onClick?.(e);
       }}
       className={cn(
-        "rounded-lg bg-light p-2 text-dark dark:bg-dark dark:text-light",
+        "rounded-lg bg-light text-dark dark:bg-dark dark:text-light",
         props.className
       )}
       title={isDark ? "Activate light mode" : "Activate dark mode"}
@@ -114,7 +117,7 @@ const ToggleTheme: FC<ToggleThemeProps> = ({
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         </motion.g>
       </motion.svg>
-    </button>
+    </Button>
   );
 };
 
