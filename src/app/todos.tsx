@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  type FC,
-  useCallback,
-  experimental_useOptimistic as useOptimistic,
-  useTransition,
-  useMemo,
-} from "react";
+import { type FC, useOptimistic, useTransition, memo } from "react";
 import { api, type RouterOutputs } from "@/server/trpc/client";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,29 +48,21 @@ const AddTodoForm: FC<{ onOpenChange?: () => void }> = ({ onOpenChange }) => {
   const { control, handleSubmit } = useForm<CreateTodo>({
     resolver: zodResolver(createTodoSchema),
   });
-  const [isPending, startTransition] = useTransition();
-  const onSubmit = useCallback(
-    handleSubmit((data) => {
-      startTransition(async () => {
-        try {
-          await api.todo.create.mutate(data);
-          await revalidate();
-          onOpenChange?.();
-        } catch (error) {
-          toast.error("Something went wrong");
-        }
-      });
-    }),
-    [handleSubmit, onOpenChange]
-  );
+  const { mutate, isLoading } = api.todo.create.useMutation({
+    onSuccess: () => {
+      revalidate();
+      onOpenChange?.();
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
+  const onSubmit = handleSubmit((data) => mutate(data));
 
   const { theme } = useTheme();
-  const color = useMemo(() => {
-    return theme === "dark" ? "secondary" : "primary";
-  }, [theme]);
+  const color = theme === "dark" ? "secondary" : "primary";
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form onSubmit={onSubmit}>
       <ModalHeader className="flex flex-col gap-1">Add Todo</ModalHeader>
       <ModalBody>
@@ -115,10 +101,10 @@ const AddTodoForm: FC<{ onOpenChange?: () => void }> = ({ onOpenChange }) => {
           color="danger"
           variant="light"
           onClick={onOpenChange}
-          disabled={isPending}>
+          disabled={isLoading}>
           Close
         </Button>
-        <Button color={color} type="submit" isLoading={isPending}>
+        <Button color={color} type="submit" isLoading={isLoading}>
           Save
         </Button>
       </ModalFooter>
@@ -146,53 +132,67 @@ interface CheckTodoProps {
   todo: Todos[0];
 }
 
-const CheckTodo = ({ todo }: CheckTodoProps) => {
-  const [optimisticTodo, setOptimisticTodo] = useOptimistic<
-    Todos[0],
-    Todos[0]["status"]
-  >(todo, (state, status) => {
-    return {
-      ...state,
-      status,
-    };
-  });
-  const mutation = useAction(updateStatusAction, {
-    onSuccess() {
-      toast.success("Todo updated");
-    },
-    onError() {
-      toast.error("Something went wrong");
-    },
-  });
-  const handleCheck = useCallback(async () => {
-    try {
-      setOptimisticTodo(
-        todo.status === Status.COMPLETED ? Status.UNCOMPLETED : Status.COMPLETED
-      );
-      mutation.mutate({
-        id: todo.id,
-        status:
-          todo.status === Status.COMPLETED
-            ? Status.UNCOMPLETED
-            : Status.COMPLETED,
+const CheckTodo = memo(
+  ({ todo }: CheckTodoProps) => {
+    const [optimisticTodo, setOptimisticTodo] = useOptimistic<
+      Todos[0],
+      Todos[0]["status"]
+    >(todo, (prevTodo, status) => {
+      return {
+        ...prevTodo,
+        status,
+      };
+    });
+    const [, startTransition] = useTransition();
+    const mutation = useAction(updateStatusAction, {
+      onSuccess() {
+        toast.success("Todo updated");
+      },
+      onError() {
+        toast.error("Something went wrong");
+      },
+    });
+    const handleCheck = () =>
+      startTransition(async () => {
+        try {
+          setOptimisticTodo(
+            todo.status === Status.COMPLETED
+              ? Status.UNCOMPLETED
+              : Status.COMPLETED
+          );
+          mutation.mutate({
+            id: todo.id,
+            status:
+              todo.status === Status.COMPLETED
+                ? Status.UNCOMPLETED
+                : Status.COMPLETED,
+          });
+          revalidate();
+        } catch (error) {
+          toast.error("Something went wrong");
+        }
       });
-      await revalidate();
-    } catch (error) {
-      toast.error("Something went wrong");
-    }
-  }, [setOptimisticTodo, todo]);
-  return (
-    <div className="wi-full flex justify-between">
-      <Checkbox
-        isSelected={optimisticTodo.status === Status.COMPLETED}
-        onValueChange={() => void handleCheck()}
-        lineThrough>
-        {optimisticTodo.title}
-      </Checkbox>
-      <EditButton todo={optimisticTodo} />
-    </div>
-  );
-};
+    return (
+      <div className="wi-full flex justify-between">
+        <Checkbox
+          isSelected={optimisticTodo.status === Status.COMPLETED}
+          onValueChange={handleCheck}
+          lineThrough>
+          {todo.title}
+        </Checkbox>
+        <EditButton todo={todo} />
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.todo.status === nextProps.todo.status &&
+      prevProps.todo.title === nextProps.todo.title &&
+      prevProps.todo.description === nextProps.todo.description
+    );
+  }
+);
+CheckTodo.displayName = "CheckTodo";
 
 const Todos: FC<TodoProps> = ({ todos, className }) => {
   return (
@@ -207,7 +207,16 @@ const Todos: FC<TodoProps> = ({ todos, className }) => {
             <AccordionItem
               key={todo.id}
               aria-label={todo.title}
-              title={<CheckTodo todo={todo} />}>
+              title={
+                <CheckTodo
+                  todo={todo}
+                  /**
+                   * @todo fix optimistic state
+                   * enforce rerender on status change
+                   */
+                  key={todo.status}
+                />
+              }>
               <p className="ml-10">{todo.description}</p>
               <br />
               <p className="mr-14 text-end">
@@ -224,4 +233,4 @@ const Todos: FC<TodoProps> = ({ todos, className }) => {
 };
 
 export default Todos;
-export { AddTodo, Skeleton };
+export { AddTodo, Skeleton, CheckTodo };

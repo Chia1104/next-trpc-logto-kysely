@@ -5,6 +5,7 @@ import { getBaseUrl } from "@/utils/get-base-url";
 import RootProvider from "@/components/root-provider";
 import Menu from "./menu";
 import { fetchUser } from "@/server/logto/fetch-user";
+import { headers } from "next/headers";
 
 export const metadata = {
   title: "Next App",
@@ -25,7 +26,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="transition-all duration-700 ease-in-out">
-        <RootProvider>
+        <RootProvider headers={headers()}>
           <Menu
             status={user.isAuthenticated ? "authenticated" : "unauthenticated"}
           />

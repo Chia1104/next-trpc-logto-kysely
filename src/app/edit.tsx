@@ -1,4 +1,4 @@
-import { type FC, useCallback, useMemo, useTransition } from "react";
+import { type FC } from "react";
 import {
   Button,
   type ButtonProps,
@@ -40,45 +40,36 @@ const Form: FC<{ onOpenChange?: () => void } & CheckTodoProps> = ({
       status: todo.status,
     },
   });
-  const [isPending, startTransition] = useTransition();
-  const onSubmit = useCallback(
-    handleSubmit((data) => {
-      startTransition(async () => {
-        try {
-          await api.todo.update.mutate(data);
-          await revalidate();
-          onOpenChange?.();
-        } catch (error) {
-          toast.error("Something went wrong");
-        }
-      });
-    }),
-    [handleSubmit, onOpenChange, startTransition]
-  );
+  const { mutate, isLoading } = api.todo.update.useMutation({
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+    onSuccess: () => {
+      revalidate();
+      onOpenChange?.();
+    },
+  });
+  const { mutate: deleteAction, isLoading: isDeleting } =
+    api.todo.delete.useMutation({
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+      onSuccess: () => {
+        revalidate();
+        onOpenChange?.();
+      },
+    });
+  const onSubmit = handleSubmit((data) => mutate(data));
 
-  const handleDelete = useCallback(
-    () =>
-      startTransition(async () => {
-        try {
-          await api.todo.delete.mutate({
-            id: todo.id,
-          });
-          await revalidate();
-          onOpenChange?.();
-        } catch (error) {
-          toast.error("Something went wrong");
-        }
-      }),
-    [onOpenChange, todo.id]
-  );
+  const handleDelete = () =>
+    deleteAction({
+      id: todo.id,
+    });
 
   const { theme } = useTheme();
-  const color = useMemo(() => {
-    return theme === "dark" ? "secondary" : "primary";
-  }, [theme]);
+  const color = theme === "dark" ? "secondary" : "primary";
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form onSubmit={onSubmit}>
       <ModalHeader className="flex flex-col gap-2">
         <p>Update Todo</p>
@@ -102,15 +93,14 @@ const Form: FC<{ onOpenChange?: () => void } & CheckTodoProps> = ({
               </div>
             )}
           />
-          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
           <Button
             isIconOnly
-            isLoading={isPending}
+            isLoading={isDeleting}
             size="sm"
             color="warning"
             className="text-white"
-            onPress={() => handleDelete()}>
-            {!isPending && (
+            onClick={handleDelete}>
+            {!isDeleting && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -165,10 +155,10 @@ const Form: FC<{ onOpenChange?: () => void } & CheckTodoProps> = ({
           color="danger"
           variant="light"
           onClick={onOpenChange}
-          disabled={isPending}>
+          disabled={isLoading || isDeleting}>
           Close
         </Button>
-        <Button color={color} type="submit" isLoading={isPending}>
+        <Button color={color} type="submit" isLoading={isLoading || isDeleting}>
           Save
         </Button>
       </ModalFooter>
@@ -188,7 +178,7 @@ const EditButton: FC<ButtonProps & CheckTodoProps> = ({ todo, ...props }) => {
           "bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg",
           props.className
         )}
-        onPress={onOpen}>
+        onClick={onOpen}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

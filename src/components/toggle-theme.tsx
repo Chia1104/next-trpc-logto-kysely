@@ -4,7 +4,7 @@ import { type FC, useId, type ComponentProps, useMemo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/utils";
 import { useTheme } from "next-themes";
-import {Button, type ButtonProps} from "@nextui-org/react";
+import { Button, type ButtonProps } from "@nextui-org/react";
 
 interface ToggleThemeProps extends ButtonProps {
   toggleTheme?: () => void;
